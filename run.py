@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import glob
 import tflite
+import numpy as np
 
 def dump_shape(tensor):
     shape_len = tensor.ShapeLength()
@@ -14,11 +15,28 @@ def dump_type(tensor):
     type = tensor.Type()
     if type == tflite.TensorType.UINT8:
         return "UINT8"
+    elif type == tflite.TensorType.INT8:
+        return "INT8"
+    elif type == tflite.TensorType.INT16:
+        return "INT16"
     elif type == tflite.TensorType.INT32:
         return "INT32"
+    elif type == tflite.TensorType.FLOAT16:
+        return "FLOAT16"
+    elif type == tflite.TensorType.FLOAT32:
+        return "FLOAT32"
     else:
         return "UNKNOWN(%d)"%type
 
+param = {}
+def dump_var(tensor):
+    global model
+    buf = model.Buffers(tensor.Buffer())
+    nonzero = np.count_nonzero(buf.DataAsNumpy())
+    if nonzero != 0:
+        return 'param'
+    else:
+        return 'var'
 
 if True:
     ## ref https://github.com/jackwish/tflite/blob/master/tests/test_mobilenet.py
@@ -76,14 +94,17 @@ if True:
             tensor = graph.Tensors(tensor_index)
             shape = dump_shape(tensor)
             type = dump_type(tensor)
-            print('\tinput:', input_i, 'index:', tensor_index, 'shape:', shape, 'type:', type)
+            var = dump_var(tensor)
+            print('\tinput:', input_i, 'index:', tensor_index, 'shape:', shape, 'type:', type, var)
 
         output_len = op.OutputsLength()
         for output_i in range(output_len):
             tensor_index = op.Outputs(output_i)
+            tensor = graph.Tensors(tensor_index)
             shape = dump_shape(tensor)
             type = dump_type(tensor)
-            print('\toutput:', output_i, 'index:', tensor_index, 'shape:', shape, 'type:', type)
+            var = dump_var(tensor)
+            print('\toutput:', output_i, 'index:', tensor_index, 'shape:', shape, 'type:', type, var)
 
         # Operator Type is also stored as index, which can obtain from `Model` object.
 
