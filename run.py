@@ -33,6 +33,7 @@ def dump_var(tensor):
     global model
     buf = model.Buffers(tensor.Buffer())
     nonzero = np.count_nonzero(buf.DataAsNumpy())
+    #return tensor.IsVariable()
     if nonzero != 0:
         return 'param'
     else:
@@ -51,16 +52,16 @@ if True:
     
     # Strings are binary format, need to decode.
     # Description is useful when exchanging models.
-    assert(model.Description().decode('utf-8') == 'TOCO Converted.')
+    print('Description:', model.Description().decode('utf-8'))
 
     # How many operator types in this model.
-    assert(model.OperatorCodesLength() == 5)
+    print('OperatorCodesLength:', model.OperatorCodesLength())
 
     # A model may have multiple subgraphs.
-    assert(model.SubgraphsLength() == 1)
+    print('SubgraphsLength:', model.SubgraphsLength())
 
     # How many tensor buffer.
-    assert(model.BuffersLength() == 90)
+    print('BuffersLength:', model.BuffersLength())
 
     # Chose one subgraph.
     graph = model.Subgraphs(0)
@@ -68,17 +69,12 @@ if True:
     # Tensors in the subgraph are represented by index description.
     assert(graph.InputsLength() == 1)
     assert(graph.OutputsLength() == 1)
-    assert(graph.InputsAsNumpy()[0] == 88)
-    assert(graph.OutputsAsNumpy()[0] == 87)
-    # All arrays can dump as Numpy array, or access individually.
-    assert(graph.Inputs(0) == 88)
-    assert(graph.Outputs(0) == 87)
 
     # Name may used to debug or check for model containing multiple subgraphs.
-    assert(graph.Name() == None)
+    print('Name:', graph.Name())
 
     # Operators in the subgraph.
-    assert(graph.OperatorsLength() == 31)
+    print('OperatorsLength:', graph.OperatorsLength())
 
     # dump each op
     op_len = graph.OperatorsLength()
@@ -108,4 +104,18 @@ if True:
 
         # Operator Type is also stored as index, which can obtain from `Model` object.
 
+    if False:
+        meta_len = model.MetadataLength()
+        print("meta_len:", meta_len)
+        for meta_i in range(meta_len):
+            meta_data = model.Metadata(meta_i)
+            buf = meta_data.Buffer()
+            print(meta_i, buf, meta_data)
+
+        meta_len = model.MetadataBufferLength()
+        print("meta_len:", meta_len)
+        for meta_i in range(meta_len):
+            meta_data = model.MetadataBuffer(meta_i)
+            buf = meta_data.Buffer()
+            print(meta_i, buf, meta_data)
 
