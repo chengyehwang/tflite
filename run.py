@@ -14,6 +14,8 @@ def dump_type(tensor):
     type = tensor.Type()
     if type == tflite.TensorType.UINT8:
         return "UINT8"
+    elif type == tflite.TensorType.INT32:
+        return "INT32"
     else:
         return "UNKNOWN(%d)"%type
 
