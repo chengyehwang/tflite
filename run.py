@@ -2,6 +2,9 @@
 import glob
 import tflite
 
+def tensor_dump(obj):
+    pass
+
 if True:
     ## ref https://github.com/jackwish/tflite/blob/master/tests/test_mobilenet.py
     files = glob.glob('*.tflite')
@@ -44,11 +47,25 @@ if True:
     # Operators in the subgraph.
     assert(graph.OperatorsLength() == 31)
 
-    # Let's use the first operator.
-    op = graph.Operators(0)
+    # dump each op
+    for op_i in range(31):
+        op = graph.Operators(op_i)
+        op_code = tflite.opcode2name(op.OpcodeIndex())
 
-    # Operator Type is also stored as index, which can obtain from `Model` object.
-    op_code = model.OperatorCodes(op.OpcodeIndex())
+        print('layer:', op_i, 'op_code:', op_code,)
 
-    print(op_code)
+        input_len = op.InputsLength()
+        for input_i in range(input_len): 
+            tensor_index = op.Inputs(input_i)
+            tensor = graph.Tensors(tensor_index)
+            print('\tinput:', input_i, tensor)
+
+        output_len = op.OutputsLength()
+        for output_i in range(output_len):
+            tensor_index = op.Inputs(input_i)
+            tensor = graph.Tensors(tensor_index)
+            print('\toutput:', input_i, tensor)
+
+        # Operator Type is also stored as index, which can obtain from `Model` object.
+
 
