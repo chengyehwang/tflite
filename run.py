@@ -2,13 +2,21 @@
 import glob
 import tflite
 
-def dump_tensor(tensor):
+def dump_shape(tensor):
     shape_len = tensor.ShapeLength()
     result = []
     for shape_i in range(shape_len):
         shape = tensor.Shape(shape_i)
         result.append(str(shape))
     return 'x'.join(result)
+
+def dump_type(tensor):
+    type = tensor.Type()
+    if type == tflite.TensorType.UINT8:
+        return "UINT8"
+    else:
+        return "UNKNOWN(%d)"%type
+
 
 if True:
     ## ref https://github.com/jackwish/tflite/blob/master/tests/test_mobilenet.py
@@ -64,12 +72,16 @@ if True:
         for input_i in range(input_len):
             tensor_index = op.Inputs(input_i)
             tensor = graph.Tensors(tensor_index)
-            print('\tinput:', input_i, 'index:', tensor_index, 'shape:', dump_tensor(tensor))
+            shape = dump_shape(tensor)
+            type = dump_type(tensor)
+            print('\tinput:', input_i, 'index:', tensor_index, 'shape:', shape, 'type:', type)
 
         output_len = op.OutputsLength()
         for output_i in range(output_len):
             tensor_index = op.Outputs(output_i)
-            print('\toutput:', output_i, 'index:', tensor_index, 'shape:', dump_tensor(tensor))
+            shape = dump_shape(tensor)
+            type = dump_type(tensor)
+            print('\toutput:', output_i, 'index:', tensor_index, 'shape:', shape, 'type:', type)
 
         # Operator Type is also stored as index, which can obtain from `Model` object.
 
