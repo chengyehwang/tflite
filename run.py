@@ -48,23 +48,22 @@ if True:
     assert(graph.OperatorsLength() == 31)
 
     # dump each op
-    for op_i in range(31):
+    op_len = graph.OperatorsLength()
+    for op_i in range(op_len):
         op = graph.Operators(op_i)
         op_code = tflite.opcode2name(op.OpcodeIndex())
 
-        print('layer:', op_i, 'op_code:', op_code,)
+        print('layer:', op_i, 'op_code:', op_code)
 
         input_len = op.InputsLength()
-        for input_i in range(input_len): 
+        for input_i in range(input_len):
             tensor_index = op.Inputs(input_i)
-            tensor = graph.Tensors(tensor_index)
-            print('\tinput:', input_i, tensor)
+            print('\tinput:', input_i, 'index:', tensor_index)
 
         output_len = op.OutputsLength()
         for output_i in range(output_len):
-            tensor_index = op.Inputs(input_i)
-            tensor = graph.Tensors(tensor_index)
-            print('\toutput:', input_i, tensor)
+            tensor_index = op.Outputs(output_i)
+            print('\toutput:', output_i, 'index:', tensor_index)
 
         # Operator Type is also stored as index, which can obtain from `Model` object.
 
