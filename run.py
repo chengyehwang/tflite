@@ -76,6 +76,18 @@ if True:
     # Operators in the subgraph.
     print('OperatorsLength:', graph.OperatorsLength())
 
+    is_var = {}
+    # dump input
+    input_len = graph.InputsLength()
+    print('input:')
+    for input_i in range(input_len):
+        tensor_index = graph.Inputs(input_i)
+        tensor = graph.Tensors(tensor_index)
+        shape = dump_shape(tensor)
+        type = dump_type(tensor)
+        var = dump_var(tensor)
+        is_var[tensor_index] = 1
+        print('\toutput:', input_i, 'index:', tensor_index, 'shape:', shape, 'type:', type, var)
     # dump each op
     op_len = graph.OperatorsLength()
     for op_i in range(op_len):
@@ -91,6 +103,11 @@ if True:
             shape = dump_shape(tensor)
             type = dump_type(tensor)
             var = dump_var(tensor)
+            if var == 'var':
+                if tensor_index in is_var:
+                    pass
+                else:
+                    print("Error:unknown var")
             print('\tinput:', input_i, 'index:', tensor_index, 'shape:', shape, 'type:', type, var)
 
         output_len = op.OutputsLength()
@@ -100,6 +117,7 @@ if True:
             shape = dump_shape(tensor)
             type = dump_type(tensor)
             var = dump_var(tensor)
+            is_var[tensor_index] = 1
             print('\toutput:', output_i, 'index:', tensor_index, 'shape:', shape, 'type:', type, var)
 
         # Operator Type is also stored as index, which can obtain from `Model` object.
