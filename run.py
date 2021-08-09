@@ -1,9 +1,11 @@
-import os
+#!/usr/bin/env python3
+import glob
 import tflite
 
 if True:
     ## ref https://github.com/jackwish/tflite/blob/master/tests/test_mobilenet.py
-    path = os.path.join(tflm_dir, tflm_name)
+    files = glob.glob('*.tflite')
+    path = files[0]
     with open(path, 'rb') as f:
         buf = f.read()
         model = tflite.Model.GetRootAsModel(buf, 0)
@@ -23,6 +25,18 @@ if True:
 
     # How many tensor buffer.
     assert(model.BuffersLength() == 90)
+
+    # Chose one subgraph.
+    graph = model.Subgraphs(0)
+
+    # Tensors in the subgraph are represented by index description.
+    assert(graph.InputsLength() == 1)
+    assert(graph.OutputsLength() == 1)
+    assert(graph.InputsAsNumpy()[0] == 88)
+    assert(graph.OutputsAsNumpy()[0] == 87)
+    # All arrays can dump as Numpy array, or access individually.
+    assert(graph.Inputs(0) == 88)
+    assert(graph.Outputs(0) == 87)
 
     # Name may used to debug or check for model containing multiple subgraphs.
     assert(graph.Name() == None)
